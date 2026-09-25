@@ -25,7 +25,7 @@ export class QueryCache {
       return undefined;
     }
     if (entry.expiresAt <= Date.now()) {
-      this.entries.delete(key);
+      this.invalidate(key);
       return undefined;
     }
     return entry.value as T;
@@ -36,10 +36,10 @@ export class QueryCache {
     if (!this.config.enabled) {
       return;
     }
-    if (this.entries.size >= this.config.maxEntries) {
+    if (this.size() >= this.config.maxEntries) {
       const oldest = this.entries.keys().next().value;
       if (oldest !== undefined) {
-        this.entries.delete(oldest);
+        this.invalidate(oldest);
       }
     }
     this.entries.set(key, { value, expiresAt: Date.now() + this.config.ttlMillis });
